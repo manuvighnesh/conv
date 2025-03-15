@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindi Number Converter</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+        #output { font-size: 24px; color: darkblue; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>Hindi Number Converter</h1>
+    
+    <button onclick="startListening()">🎙 Speak a Number</button>
+    <button onclick="convertText()">Convert</button>
+    
+    <p id="recognizedText">Recognized: <span id="textOutput">None</span></p>
+    <p id="output"></p>
+
+    <script>
+        async function startListening() {
+            document.getElementById("textOutput").innerText = "Listening...";
+            const response = await fetch("/listen");
+            const data = await response.json();
+            document.getElementById("textOutput").innerText = data.text || "Could not recognize speech";
+        }
+
+        async function convertText() {
+            let text = document.getElementById("textOutput").innerText;
+            if (text === "None" || text === "Could not recognize speech") {
+                alert("Please speak a number first!");
+                return;
+            }
+
+            const response = await fetch("/convert", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            });
+
+            const data = await response.json();
+            document.getElementById("output").innerText = data.hindi || "No number detected";
+        }
+    </script>
+
+</body>
+</html>
